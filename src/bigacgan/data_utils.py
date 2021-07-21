@@ -141,7 +141,73 @@ def train(dataset, generator, discriminator, recognizer, composite_gan, checkpoi
     if not os.path.exists(model_path):
         os.makedirs(model_path)
 
-    generator.save(model_path + 'generator_{}'.format(epochs), save_format='tf')
+    generator.save_weights(model_path + 'generator_weights_{}.h5'.format(epochs))
+    # generator_json = generator.to_json()
+    # generator_json_file_name = model_path + 'generator_json_{}.json'.format(epochs)
+    # with open( generator_json_file_name, "w") as json_file:
+    #     json_file.write(generator_json)
+    # generator.save(model_path + 'generator_{}'.format(epochs), save_format='tf')
+
+
+
+def train_2(dataset, generator, discriminator, recognizer, composite_gan, checkpoint, checkpoint_prefix,
+          generator_optimizer, discriminator_optimizer, recognizer_optimizer, seed_labels, buffer_size, batch_size,
+          epochs, model_path, latent_dim, gen_path, loss_fn, disc_iters, random_words, bucket_size, char_vector):
+    """
+    Whole training procedure
+
+    :param dataset:                     python generator
+    :param generator:                   generator model
+    :param discriminator:               discriminator model
+    :param recognizer:                  Auxiliary Classifier (CRNN)
+    :param composite_gan:               Composite GAN
+    :param checkpoint:                  tf.train.Checkpoint
+    :param checkpoint_prefix:           directory path where to store checkpoints
+    :param generator_optimizer:         generator optimizer
+    :param discriminator_optimizer:     discriminator optimizer
+    :param recognizer_optimizer:        recognizer optimizer
+    :param seed_labels:                 noise vector + random labels
+    :param buffer_size:                 buffer size (number of training samples)
+    :param batch_size:                  batch size
+    :param epochs:                      number of epochs
+    :param model_path:                  directory path where to store trained model
+    :param latent_dim:                  noise vector
+    :param gen_path:                    directory path where to store generated images
+    :param loss_fn:                     loss function
+    :param disc_iters:                  take <disc_iters> D steps per G step
+    :param random_words:                list of random words
+    :param bucket_size:                 max sequence length
+    :param char_vector:                 valid vocabulary represented as array of chars/ string
+    :return:
+    """
+
+    # batch_per_epoch = int(buffer_size / batch_size) + 1
+    batch_per_epoch = int(buffer_size / batch_size) if (buffer_size % batch_size == 0) else int(buffer_size / batch_size) + 1
+    print('training...')
+    for epoch_idx in range(epochs):
+        start = time.time()
+
+        for batch_idx, batch in enumerate(dataset):
+            image_batch, label_batch = batch
+
+            train_step(epoch_idx, batch_idx, batch_per_epoch, image_batch, label_batch, discriminator, recognizer,
+                       composite_gan, generator_optimizer, discriminator_optimizer, recognizer_optimizer, batch_size,
+                       latent_dim, loss_fn, disc_iters, random_words, bucket_size)
+
+        # Produce images for the GIF as we go
+        generate_and_save_images(generator, epoch_idx + 1, seed_labels, gen_path, char_vector)
+
+        # Save the model every 5 epochs
+        if (epoch_idx + 1) % 5 == 0:
+            checkpoint.save(file_prefix=checkpoint_prefix)
+
+        print('Time for epoch {} is {} sec'.format(epoch_idx + 1, time.time() - start))
+
+    # save generator model
+    if not os.path.exists(model_path):
+        os.makedirs(model_path)
+
+    generator.save_weights(model_path + 'generator_weights_{}.h5'.format(epochs))
 
 
 # Notice the use of `tf.function`
@@ -326,6 +392,31 @@ def load_random_word_list(reading_dir, bucket_size, char_vector):
 
     random_words_path = os.path.dirname(os.path.dirname(os.path.dirname(reading_dir))) + '/'
     with open(os.path.join(random_words_path, 'random_words.txt'), 'r') as fi_random_word_list:
+        for word in fi_random_word_list:
+            word = word.strip()
+            bucket = len(word)
+
+            if bucket <= bucket_size:
+                random_words[bucket - 1].append([char_vector.index(char) for char in word])
+
+    return random_words
+
+def load_random_word_list_2(reading_dir, bucket_size, char_vector):
+    """
+    Helper to produce random word list; encode each word into vector defined by char_vector
+    e.g. 'auto' -> [0, 20, 19, 14]
+
+    :param reading_dir:         input dir of random_words.txt
+    :param bucket_size:         max transcription length of random word
+    :param char_vector:         index of char within charvector represents char encoding
+    :return:
+    """
+
+    random_words = []
+    for i in range(bucket_size):
+        random_words.append([])
+
+    with open(os.path.join(reading_dir, 'random_digits.txt'), 'r') as fi_random_word_list:
         for word in fi_random_word_list:
             word = word.strip()
             bucket = len(word)

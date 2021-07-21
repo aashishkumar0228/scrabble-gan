@@ -6,7 +6,7 @@ from src.bigacgan.arch_ops import NonLocalBlock, SpatialEmbedding
 from src.bigacgan.resnet_ops import ResNetBlockUp, ResNetBlockDown
 
 
-def make_recognizer(input_dim, sequence_length, output_classes, gen_path, vis_model=True):
+def make_recognizer(input_dim, sequence_length, output_classes, gen_path, vis_model=False):
     """
     Build (fully convolutional) CRNN network based on https://arxiv.org/abs/1507.05717
 
@@ -84,7 +84,7 @@ def make_recognizer(input_dim, sequence_length, output_classes, gen_path, vis_mo
 
 
 def make_generator(latent_dim, input_dim, embed_y, gen_path, kernel_reg, blocks_with_attention, vocab_size,
-                   vis_model=True):
+                   vis_model=False):
     """
     (fully convolutional) Generator based on
 
@@ -175,7 +175,7 @@ def make_generator(latent_dim, input_dim, embed_y, gen_path, kernel_reg, blocks_
     return model
 
 
-def make_discriminator(gen_path, input_dim, kernel_reg, blocks_with_attention, vis_model=True):
+def make_discriminator(gen_path, input_dim, kernel_reg, blocks_with_attention, vis_model=False):
     """
      (fully convolutional) Discriminator based on
 
@@ -237,7 +237,7 @@ def make_discriminator(gen_path, input_dim, kernel_reg, blocks_with_attention, v
     return model
 
 
-def make_gan(g_model, d_model, r_model, gen_path, vis_model=True):
+def make_gan(g_model, d_model, r_model, gen_path, vis_model=False):
     """
     Update G through composite model
 
