@@ -12,7 +12,7 @@ setup_optimizer.disc_iters=1                    #2
 
 # Shared specs (G and D)
 shared_specs.epochs = 2
-shared_specs.batch_size = 256
+shared_specs.batch_size = 1
 shared_specs.latent_dim = 128
 shared_specs.embed_y = (32, 8192)
 shared_specs.num_gen = 4
