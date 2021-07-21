@@ -63,8 +63,8 @@ def main():
 
     # load and preprocess dataset (python generator)
     # train_dataset = load_prepare_data(in_dim, batch_size, read_dir, char_vec, bucket_size)
-    df_base_path = '/Users/aashishkumar/Documents/Projects/forked_repos/scrabble-gan/res/data_digits/'
-    image_base_path = '/Users/aashishkumar/Documents/Projects/forked_repos/scrabble-gan/res/data_digits/combined_1_to_8_actual_shape_real_resize/'
+    df_base_path = read_dir
+    image_base_path = read_dir + '/combined_1_to_8_actual_shape_real_resize/'
     train_dataset = MultiDigitDataLoader(df_base_path, 
                                         image_base_path, 
                                         batch_size,
