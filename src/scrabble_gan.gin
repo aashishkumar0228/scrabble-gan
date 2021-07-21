@@ -29,10 +29,10 @@ io.model_dir = '/res/out/big_ac_gan/model/'
 
 # Dataset
 io.input_dim = (32, 160, 1)
-io.buf_size = 36000
+io.buf_size = 360000
 io.n_classes = 10
 io.seq_len = None
 io.bucket_size = 8
 io.raw_dir = '/res/data/iamDB/words/'
-io.read_dir = '/res/data_digits/'
+io.read_dir = '/res/data_digits_big/'
 io.char_vec = '0123456789'
