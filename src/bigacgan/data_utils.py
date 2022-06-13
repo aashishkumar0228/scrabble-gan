@@ -425,3 +425,28 @@ def load_random_word_list_2(reading_dir, bucket_size, char_vector):
                 random_words[bucket - 1].append([char_vector.index(char) for char in word])
 
     return random_words
+
+def load_random_word_list_3(reading_dir, bucket_size, char_vector):
+    """
+    Helper to produce random word list; encode each word into vector defined by char_vector
+    e.g. 'auto' -> [0, 20, 19, 14]
+
+    :param reading_dir:         input dir of random_words.txt
+    :param bucket_size:         max transcription length of random word
+    :param char_vector:         index of char within charvector represents char encoding
+    :return:
+    """
+
+    random_words = []
+    for i in range(bucket_size):
+        random_words.append([])
+
+    with open(os.path.join(reading_dir, 'random_words.txt'), 'r') as fi_random_word_list:
+        for word in fi_random_word_list:
+            word = word.strip()
+            bucket = len(word)
+
+            if bucket <= bucket_size:
+                random_words[bucket - 1].append([char_vector.index(char) for char in word])
+
+    return random_words

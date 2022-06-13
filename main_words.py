@@ -8,7 +8,7 @@ import tensorflow as tf
 tf.config.run_functions_eagerly(True)
 
 from src.bigacgan.arch_ops import spectral_norm
-from src.bigacgan.data_utils import load_prepare_data, train_2, make_gif, load_random_word_list
+from src.bigacgan.data_utils import load_prepare_data, train_2, make_gif, load_random_word_list_3
 from src.bigacgan.net_architecture import make_generator, make_discriminator, make_recognizer, make_gan
 from src.bigacgan.net_loss import hinge, not_saturating
 from src.bigacgan.iamdb_words_dataloader import IAMDbWordsDataLoader
@@ -59,7 +59,7 @@ def main():
 
     # load random words into memory (used for word generation by G)
     print(read_dir)
-    random_words = load_random_word_list(read_dir, bucket_size, char_vec)
+    random_words = load_random_word_list_3(read_dir, bucket_size, char_vec)
 
     # load and preprocess dataset (python generator)
     # train_dataset = load_prepare_data(in_dim, batch_size, read_dir, char_vec, bucket_size)
